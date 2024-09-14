@@ -28,7 +28,8 @@ export default tseslint.config(
         "prefer-double"
       ],
       "quotes": ["warn", "double", { "avoidEscape": true }],
-      "semi": ["warn", "always"]
+      "semi": ["warn", "always"],
+      "@typescript-eslint/no-unused-vars": "warn"
     },
   },
 )
