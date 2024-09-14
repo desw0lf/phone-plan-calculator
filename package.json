@@ -5,7 +5,8 @@
   "type": "module",
   "packageManager": "pnpm@9.10.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 5757",
+    "start": "npm run dev",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
