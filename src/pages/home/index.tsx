@@ -1,16 +1,19 @@
-import { Header } from "@/components/header";
-import { Footer } from "@/components/footer";
+// import { Header } from "@/components/header";
+// import { Footer } from "@/components/footer";
+
+import { AuroraBackground } from "@/components/ui/aurora-background";
+import { Main } from "./main";
 
 export function Home() {
   return (
-    <div className="relative flex min-h-screen flex-col">
-      <Header />
-      <main className="flex-1">
-        <div className="container relative">
-          content
+    <AuroraBackground>
+      <div className="relative flex w-full min-h-screen flex-col sm:gap-4">
+        <div className="min-h-screen lg:py-10 lg:px-10 xl:py-20 xl:px-40">
+        {/* <Header /> */}
+        <Main />
+        {/* <Footer /> */}
         </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </AuroraBackground>
   );
 }
