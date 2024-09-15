@@ -1,11 +1,11 @@
 {
   "typescript.tsdk": "./node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
+  "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
-    "source.fixAll.stylelint": "explicit" 
+    "source.fixAll.eslint": "always"
   },
   "files.associations": {
     "*.css": "tailwindcss"
-  } 
+  }
 }
