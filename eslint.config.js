@@ -5,6 +5,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 import prettierPlugin from "eslint-plugin-prettier";
 import prettierConfig from "eslint-config-prettier";
+import customPrettierConfig from "./prettier.config.js";
 
 export default tseslint.config(
   { ignores: ["dist"] },
@@ -28,13 +29,7 @@ export default tseslint.config(
       ],
       "prettier/prettier": [
         "warn",
-        {
-          singleQuote: false,
-          arrowParens: "always",
-          printWidth: 160,
-          bracketSameLine: true,
-          endOfLine: "auto"
-        }
+        customPrettierConfig
       ],
       "@typescript-eslint/no-unused-vars": "warn",
       // "jsx-quotes": [
