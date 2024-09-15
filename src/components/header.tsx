@@ -8,9 +8,7 @@ export const Header = () => {
           <a className="mr-4 flex items-center space-x-2 lg:mr-6" href="/">
             <span className="font-bold lg:inline-block">PPC</span>
           </a>
-          <nav className="flex items-center gap-4 text-sm lg:gap-6">
-            xx
-          </nav>
+          <nav className="flex items-center gap-4 text-sm lg:gap-6">xx</nav>
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           {/* <div className="w-full flex-1 md:w-auto md:flex-none">

@@ -31,7 +31,7 @@ export default tseslint.config(
         {
           singleQuote: false,
           arrowParens: "always",
-          printWidth: 200,
+          printWidth: 160,
           bracketSameLine: true,
           endOfLine: "auto"
         }

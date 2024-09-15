@@ -9,9 +9,9 @@ export function Home() {
     <AuroraBackground>
       <div className="relative flex w-full min-h-screen flex-col sm:gap-4">
         <div className="min-h-screen lg:py-10 lg:px-10 xl:py-20 xl:px-40">
-        {/* <Header /> */}
-        <Main />
-        {/* <Footer /> */}
+          {/* <Header /> */}
+          <Main />
+          {/* <Footer /> */}
         </div>
       </div>
     </AuroraBackground>
