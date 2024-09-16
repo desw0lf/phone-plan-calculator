@@ -1,18 +1,18 @@
 import { useSettings } from "@/providers/settings-provider";
 import { toCurrency } from "../../helpers/to-currency";
 
-export const Currency: React.FC<{ value: number }> = ({ value }) => {
+export const Currency: React.FC<{ value: number; className?: string }> = ({ value, className }) => {
   const { currencySettings } = useSettings();
   if ("prefix" in currencySettings) {
     return (
-      <span>
+      <span className={className}>
         {currencySettings.prefix}
         {toCurrency(value)}
       </span>
     );
   }
   return (
-    <span>
+    <span className={className}>
       {toCurrency(value)} {currencySettings.suffix}
     </span>
   );

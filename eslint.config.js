@@ -32,6 +32,7 @@ export default tseslint.config(
         customPrettierConfig
       ],
       "@typescript-eslint/no-unused-vars": ["warn", { ignoreRestSiblings: true, argsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-explicit-any": "warn",
       // "jsx-quotes": [
       //   "warn",
       //   "prefer-double"

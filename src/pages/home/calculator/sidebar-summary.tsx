@@ -1,18 +1,62 @@
+import { useMemo } from "react";
 import { Currency } from "@/components/ui-custom/currency";
 import { cn as classNames } from "@/lib/utils";
 import { Info, Copy, MoreVertical } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { generatePaymentMonths } from "@/helpers/generate-payment-months";
+// ? TYPES:
+import type { CalculatorState } from "./calculator.types";
 
-export const SidebarSummary = () => {
-  const contractLength = 24;
-  // const phoneValue = 999;
-  const totals = {
-    minimum: 866.34,
-    maximum: 944.94,
-    guessOriginal: 830,
-  };
+type InitialMonthlyBreakdown = ReturnType<typeof generatePaymentMonths>[0];
+
+interface MonthBreakdown extends InitialMonthlyBreakdown {
+  minCost: number;
+  maxCost: number;
+}
+
+function updateCost(originalValue: number, percent: number, fixed: number): number {
+  const result = originalValue * (1 + percent / 100) + fixed;
+  return parseFloat(result.toFixed(2));
+}
+
+export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contractStartDate: ISODate }> = ({ state, contractStartDate }) => {
+  const { totals, monthlyBreakdown } = useMemo(() => {
+    // const hasAdjustments = state.adjustements.length > 0;
+    const adjustmentIsoDates = state.adjustements.map(({ increaseDate }) => increaseDate);
+    const months = generatePaymentMonths(contractStartDate, state.contractLength, adjustmentIsoDates);
+    const { monthlyBreakdown, totalMin, totalMax } = months.reduce(
+      (acc: { monthlyBreakdown: MonthBreakdown[]; minCost: number; maxCost: number; totalMin: number; totalMax: number }, m) => {
+        const adj = state.adjustements[m.billingIndex];
+        const minCost = m.isIncreaseStartDate
+          ? updateCost(acc.minCost, adj.staticPercentageIncrease + adj.rpiPercentagePredictionFrom, adj.staticCashIncrease)
+          : acc.minCost;
+        const maxCost = m.isIncreaseStartDate
+          ? updateCost(acc.maxCost, adj.staticPercentageIncrease + adj.rpiPercentagePredictionTo, adj.staticCashIncrease)
+          : acc.maxCost;
+        const newValue = { ...m, minCost, maxCost };
+        return {
+          ...acc,
+          monthlyBreakdown: [...acc.monthlyBreakdown, newValue],
+          minCost,
+          maxCost,
+          totalMin: acc.totalMin + minCost,
+          totalMax: acc.totalMax + maxCost,
+        };
+      },
+      { monthlyBreakdown: [], minCost: state.monthlyCost, maxCost: state.monthlyCost, totalMin: 0, totalMax: 0 },
+    );
+
+    return {
+      monthlyBreakdown,
+      totals: {
+        minimum: totalMin + state.upfrontCost,
+        maximum: totalMax + state.upfrontCost,
+        guessOriginal: state.upfrontCost + state.monthlyCost * state.contractLength,
+      },
+    };
+  }, [state, contractStartDate]);
   const totalList = [
     { label: "Minimum", value: totals.minimum },
     { label: "Maximum", value: totals.maximum },
@@ -59,7 +103,7 @@ export const SidebarSummary = () => {
       </CardHeader>
       <CardContent className="p-6 text-sm">
         <div className="grid gap-3">
-          <div className="font-semibold">Total cost over {contractLength} months</div>
+          <div className="font-semibold">Total cost over {state.contractLength} months</div>
           <ul className="grid gap-3">
             {totalList.map(({ label, value, className, tooltip }) => (
               <li key={label} className={classNames("flex items-center justify-between", className)}>
