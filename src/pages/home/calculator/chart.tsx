@@ -1,6 +1,6 @@
 // import { TrendingUp } from "lucide-react";
 import { useSettings } from "@/providers/settings-provider";
-import { Bar, BarChart, LabelList, XAxis, YAxis, Legend } from "recharts";
+import { Bar, BarChart, LabelList, XAxis, YAxis } from "recharts";
 // import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { toCurrency } from "@/helpers/to-currency";
@@ -58,7 +58,7 @@ export const Chart: React.FC<{ concatenatedMonthlyBreakdown: ConcatenatedMonthBr
         {tooltipActive && (
           <ChartTooltip
             cursor={false}
-            content={<ChartTooltipContent valueFormatter={tooltipFormatter as any} indicator="dot" className="[&_.tabular-nums]:ml-6" />}
+            content={<ChartTooltipContent valueFormatter={tooltipFormatter as never} indicator="dot" className="[&_.tabular-nums]:ml-6" />}
           />
         )}
         <Bar dataKey="minCost" layout="vertical" fill="var(--color-minCost)" radius={4}>
