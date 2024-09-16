@@ -30,13 +30,15 @@ const act = {
   ON_CHANGE_VALUE: "ON_CHANGE_VALUE",
   ON_ADD_INCREASE: "ON_ADD_INCREASE",
   ON_REMOVE_INCREASE: "ON_REMOVE_INCREASE",
+  ON_CONTRACT_START_DATE_CHANGE: "ON_CONTRACT_START_DATE_CHANGE",
 } as const;
 
 // type ActionType = keyof typeof act;
 type Action =
   | { type: "ON_CHANGE_VALUE"; event: React.ChangeEvent<HTMLInputElement> }
   | { type: "ON_ADD_INCREASE"; contractStartDate: ISODate }
-  | { type: "ON_REMOVE_INCREASE"; i: number };
+  | { type: "ON_REMOVE_INCREASE"; i: number }
+  | { type: "ON_CONTRACT_START_DATE_CHANGE"; contractStartDate: ISODate };
 
 function limitValue(value: string, max: string) {
   if (!max) {
@@ -108,6 +110,32 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
       },
     };
   }
+  if (action.type === act.ON_CONTRACT_START_DATE_CHANGE) {
+    const isoDates = generateInitialIncreaseDates(action.contractStartDate, state.contractLength);
+    const newAdjustements = isoDates.map((increaseDate, i) => {
+      const newAdj = state.adjustements[i] || initialAdjustement;
+      return {
+        ...newAdj,
+        uid: generateUid(),
+        increaseDate,
+      };
+    });
+    const newParsedAdjustements = isoDates.map((increaseDate, i) => {
+      const newAdj = state.parsed.adjustements[i] || initialParsedAdjustement;
+      return {
+        ...newAdj,
+        increaseDate,
+      };
+    });
+    return {
+      ...state,
+      adjustements: newAdjustements,
+      parsed: {
+        ...state.parsed,
+        adjustements: newParsedAdjustements,
+      },
+    };
+  }
   return state;
 }
 
@@ -150,7 +178,7 @@ export const Calculator = () => {
   const { currencySettings, contractStartDate } = useSettings();
   const [state, dispatch] = useReducer(reducer, initialState);
   useEffect(() => {
-    console.log("change");
+    dispatch({ type: "ON_CONTRACT_START_DATE_CHANGE", contractStartDate });
   }, [contractStartDate]);
   const onValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: act.ON_CHANGE_VALUE, event });
