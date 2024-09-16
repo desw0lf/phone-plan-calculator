@@ -196,6 +196,12 @@ const initialState: CalculatorState = {
   parsed: initialParsed,
 };
 
+const SmallLabelHack = () => (
+  <span className="text-sm leading-none invisible" aria-hidden="true">
+    .
+  </span>
+);
+
 export const Calculator = () => {
   const { currencySettings, contractStartDate } = useSettings();
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -207,76 +213,78 @@ export const Calculator = () => {
     customDispatch({ type: act.ON_CHANGE_VALUE, event, contractStartDate });
   };
   return (
-    <main className="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-8">
-      <form className="flex flex-col w-full gap-6 overflow-auto lg:col-span-5">
+    <main className="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-8 [&_.input-currency_input]:max-w-[76px] [&_.input-percent_input]:max-w-[66px]">
+      <form className="flex flex-col w-full gap-4 overflow-auto lg:col-span-5">
         <Card>
           <CardContent className="pt-6">
             <div className="grid gap-4">
-              <div className="flex flex-wrap gap-3 items-center [&>*]:grow [&>*]:w-auto [&>label]:text-right">
-                <Label htmlFor="monthlyCost" className="max-w-40">
-                  Monthly Cost
-                </Label>
-                <InputWithLabel
-                  autoFocus
-                  labels={currencySettings}
-                  id="monthlyCost"
-                  name="monthlyCost"
-                  type="number"
-                  min={0}
-                  max={999}
-                  step={1}
-                  value={state.monthlyCost}
-                  onChange={onValueChange}
-                />
-              </div>
-              <div className="flex flex-wrap gap-3 items-center [&>*]:grow [&>*]:w-auto [&>label]:text-right">
-                <Label htmlFor="upfrontCost" className="max-w-40">
-                  Upfront Cost
-                </Label>
-                <InputWithLabel
-                  labels={currencySettings}
-                  id="upfrontCost"
-                  name="upfrontCost"
-                  type="number"
-                  min={0}
-                  max={99999}
-                  step={10}
-                  value={state.upfrontCost}
-                  onChange={onValueChange}
-                />
-              </div>
-              <div className="flex flex-wrap gap-3 items-center [&>*]:grow [&>*]:w-auto [&>label]:text-right">
-                <Label htmlFor="contractLength" className="max-w-40">
-                  Contract Length
-                </Label>
-                <ContractSelect value={state.contractLength} onValueChange={onValueChange} />
-              </div>
-              <div className="flex flex-wrap gap-3 items-center [&>*]:grow [&>*]:w-auto [&>label]:text-right">
-                <Label htmlFor="phoneValue" className="max-w-40 text-xs">
-                  Phone Value
-                </Label>
-                <InputWithLabel
-                  className="h-8 my-1"
-                  labels={currencySettings}
-                  id="phoneValue"
-                  name="phoneValue"
-                  type="number"
-                  min={0}
-                  max={99999}
-                  step={10}
-                  value={state.phoneValue}
-                  onChange={onValueChange}
-                />
+              <div className="flex gap-3">
+                <div className="flex flex-col gap-3">
+                  <Label htmlFor="monthlyCost">Monthly Cost</Label>
+                  <InputWithLabel
+                    className="input-currency"
+                    autoFocus
+                    labels={currencySettings}
+                    id="monthlyCost"
+                    name="monthlyCost"
+                    type="number"
+                    min={0}
+                    max={999}
+                    step={1}
+                    value={state.monthlyCost}
+                    onChange={onValueChange}
+                  />
+                </div>
+                <div className="flex flex-col gap-3">
+                  <Label htmlFor="upfrontCost">Upfront Cost</Label>
+                  <InputWithLabel
+                    className="input-currency"
+                    labels={currencySettings}
+                    id="upfrontCost"
+                    name="upfrontCost"
+                    type="number"
+                    min={0}
+                    max={99999}
+                    step={10}
+                    value={state.upfrontCost}
+                    onChange={onValueChange}
+                  />
+                </div>
+                <div className="flex flex-col gap-3 flex-grow">
+                  <Label htmlFor="contractLength">Contract Length</Label>
+                  <ContractSelect value={state.contractLength} onValueChange={onValueChange} />
+                </div>
+                <div className="flex flex-col gap-3 ml-auto">
+                  <Label htmlFor="phoneValue" className="text-xs leading-none text-muted-foreground">
+                    Phone Value
+                    <SmallLabelHack />
+                  </Label>
+                  <InputWithLabel
+                    className="input-currency h-8"
+                    labels={currencySettings}
+                    id="phoneValue"
+                    name="phoneValue"
+                    type="number"
+                    min={0}
+                    max={99999}
+                    step={10}
+                    value={state.phoneValue}
+                    onChange={onValueChange}
+                  />
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Price Adjustments</CardTitle>
-            <CardDescription>Marshmallow powder cupcake dragée tiramisu liquorice gummies jelly.</CardDescription>
+            <CardTitle className="text-lg">Cost Adjustments</CardTitle>
+            <CardDescription>
+              Factor in future price increases to your monthly bill. Add known percentage hikes and estimate ranges for uncertain increases. This helps
+              calculate a more accurate total cost over your contract's lifetime.
+            </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-col gap-3">
             {state.adjustements.length === 0 && (
               <p className="text-muted-foreground mb-6">
                 No adjustments...{" "}
@@ -298,75 +306,82 @@ export const Calculator = () => {
             )}
             {state.adjustements.map((adj, i) => (
               <fieldset key={adj.uid} className="relative grid gap-4 rounded-lg border p-4">
-                <legend className="-ml-0.5 px-3 text-md font-medium">{i + 1}</legend>
+                <legend className="-ml-0.5 px-3 text-md font-medium text-[--input-label-foreground]">Adjustment {i + 1}</legend>
                 <div className="grid gap-3">
-                  <div className="flex flex-wrap gap-3 items-center [&>*]:grow [&>*]:w-auto">
-                    <Label htmlFor={`staticPercentageIncrease@${i}`} className="max-w-40">
-                      % Increase
-                    </Label>
-                    <InputWithLabel
-                      labels={{ suffix: "%" }}
-                      id={`staticPercentageIncrease@${i}`}
-                      name={`staticPercentageIncrease@${i}`}
-                      type="number"
-                      min={0}
-                      max={999}
-                      step={0.1}
-                      value={adj.staticPercentageIncrease}
-                      onChange={onValueChange}
-                    />
-                  </div>
-                  <div className="flex flex-wrap gap-3 items-center [&>*]:grow [&>*]:w-auto">
-                    <Label htmlFor={`rpiPercentagePredictionFrom@${i}`} className="max-w-40">
-                      RPI % Prediction
-                    </Label>
-                    <div className="flex items-center gap-2">
+                  <div className="flex gap-3">
+                    <div className="flex flex-col gap-3">
+                      <Label htmlFor={`staticPercentageIncrease@${i}`}>% Increase</Label>
                       <InputWithLabel
+                        className="input-percent"
                         labels={{ suffix: "%" }}
-                        id={`rpiPercentagePredictionFrom@${i}`}
-                        name={`rpiPercentagePredictionFrom@${i}`}
+                        id={`staticPercentageIncrease@${i}`}
+                        name={`staticPercentageIncrease@${i}`}
                         type="number"
                         min={0}
                         max={999}
                         step={0.1}
-                        value={adj.rpiPercentagePredictionFrom}
-                        onChange={onValueChange}
-                      />
-                      <span>to</span>
-                      <InputWithLabel
-                        labels={{ suffix: "%" }}
-                        id={`rpiPercentagePredictionTo@${i}`}
-                        name={`rpiPercentagePredictionTo@${i}`}
-                        type="number"
-                        min={0}
-                        max={999}
-                        step={0.1}
-                        value={adj.rpiPercentagePredictionTo}
+                        value={adj.staticPercentageIncrease}
                         onChange={onValueChange}
                       />
                     </div>
-                  </div>
-                  <div className="flex flex-wrap gap-3 items-center [&>*]:grow [&>*]:w-auto">
-                    <Label htmlFor={`staticCashIncrease@${i}`} className="max-w-40">
-                      Cash Increase
-                    </Label>
-                    <InputWithLabel
-                      labels={currencySettings}
-                      id={`staticCashIncrease@${i}`}
-                      name={`staticCashIncrease@${i}`}
-                      type="number"
-                      min={0}
-                      max={999}
-                      step={0.1}
-                      value={adj.staticCashIncrease}
-                      onChange={onValueChange}
-                    />
-                  </div>
-                  <div className="flex flex-wrap gap-3 items-center [&>*]:grow [&>*]:w-auto">
-                    <Label htmlFor={`increaseDate@${i}`} className="max-w-40">
-                      Starting date
-                    </Label>
-                    <span>{adj.increaseDate}</span>
+                    <div className="flex flex-col gap-3">
+                      <Label htmlFor={`rpiPercentagePredictionFrom@${i}`}>
+                        RPI % Prediction <span className="text-xs text-muted-foreground ml-2 opacity-80">(From - To)</span>
+                      </Label>
+                      <div className="flex items-center">
+                        <InputWithLabel
+                          placeholder="From"
+                          className="input-percent border-r-0 rounded-r-none"
+                          labels={{ suffix: "%" }}
+                          id={`rpiPercentagePredictionFrom@${i}`}
+                          name={`rpiPercentagePredictionFrom@${i}`}
+                          type="number"
+                          min={0}
+                          max={999}
+                          step={0.1}
+                          value={adj.rpiPercentagePredictionFrom}
+                          onChange={onValueChange}
+                        />
+                        <span className="flex items-center px-2 font-semibold bg-background/40 text-[--input-label-foreground] h-10 border-y border-input">
+                          -
+                        </span>
+                        <InputWithLabel
+                          placeholder="To"
+                          className="input-percent border-l-0 rounded-l-none"
+                          labels={{ suffix: "%" }}
+                          id={`rpiPercentagePredictionTo@${i}`}
+                          name={`rpiPercentagePredictionTo@${i}`}
+                          type="number"
+                          min={0}
+                          max={999}
+                          step={0.1}
+                          value={adj.rpiPercentagePredictionTo}
+                          onChange={onValueChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <Label htmlFor={`staticCashIncrease@${i}`}>Cash Increase</Label>
+                      <InputWithLabel
+                        className="input-currency"
+                        labels={currencySettings}
+                        id={`staticCashIncrease@${i}`}
+                        name={`staticCashIncrease@${i}`}
+                        type="number"
+                        min={0}
+                        max={999}
+                        step={0.1}
+                        value={adj.staticCashIncrease}
+                        onChange={onValueChange}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-3 ml-auto">
+                      <Label htmlFor={`increaseDate@${i}`} className="text-xs leading-none text-muted-foreground">
+                        Starting date
+                        <SmallLabelHack />
+                      </Label>
+                      <span>{adj.increaseDate.substring(0, 10)}</span>
+                    </div>
                   </div>
                 </div>
                 <Button
@@ -380,7 +395,7 @@ export const Calculator = () => {
                 </Button>
               </fieldset>
             ))}
-            <footer className="mt-3">
+            <footer>
               <Button type="button" className="gap-1 w-full" variant="ghost" onClick={() => dispatch({ type: act.ON_ADD_INCREASE, contractStartDate })}>
                 <CirclePlus className="h-3.5 w-3.5" />
                 Add Increase

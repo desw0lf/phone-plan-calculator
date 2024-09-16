@@ -26,7 +26,10 @@ const InputWithLabel = forwardRef<HTMLInputElement, InputProps>(({ className, ty
       <InputLabel label={labels.prefix} />
       <input
         type={type}
-        className="flex flex-1 bg-background/40 px-3 text-sm focus:outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+        className={cn(
+          "flex flex-1 bg-background/40 text-sm focus:outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+          type === "number" ? "pl-3 pr-1" : "px-3",
+        )}
         ref={ref}
         {...props}
       />

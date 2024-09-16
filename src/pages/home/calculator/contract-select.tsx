@@ -21,8 +21,8 @@ export const ContractSelect: React.FC<ContractSelectProps> = ({ value, onValueCh
           <RadioGroupItem value={item.value as unknown as string} id={`length_${item.value}`} className="peer sr-only" />
           <Label
             htmlFor={`length_${item.value}`}
-            className="leading-relaxed flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-3 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
-            <span className="text-xl">{item.value}</span>
+            className="leading-relaxed flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary">
+            <span className="text-lg">{item.value}</span>
             <span>months</span>
           </Label>
         </div>
