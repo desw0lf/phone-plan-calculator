@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Currency } from "@/components/ui-custom/currency";
 import { cn as classNames } from "@/lib/utils";
 import { Info, Copy, MoreVertical } from "lucide-react";
-// import { Separator } from "@/components/ui/separator";
+import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Chart } from "./chart";
@@ -92,7 +92,7 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
     },
   ];
   return (
-    <Card className="overflow-hidden">
+    <Card className="flex flex-col overflow-hidden">
       <CardHeader className="flex flex-row items-start bg-muted/35">
         <div className="grid gap-0.5">
           <CardTitle className="group flex items-center gap-2 text-lg">
@@ -139,12 +139,15 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
               </li>
             ))}
           </ul>
-          {/* <Separator className="my-4" />
-          <div className="font-semibold">Monthly cost breakdown</div> */}
-          <Chart concatenatedMonthlyBreakdown={concatenatedMonthlyBreakdown} subheading={dateLabel} />
+          <Separator className="my-4" />
+          <div>
+            <div className="font-semibold">Monthly cost breakdown</div>
+            <p className="text-xs text-muted-foreground">{dateLabel}</p>
+          </div>
+          <Chart concatenatedMonthlyBreakdown={concatenatedMonthlyBreakdown} />
         </div>
       </CardContent>
-      <CardFooter className="flex flex-row items-center border-t bg-muted/35 px-6 py-3">
+      <CardFooter className="mt-auto flex flex-row items-center border-t bg-muted/35 px-6 py-3">
         <div className="text-xs text-muted-foreground">
           Updated <time dateTime={contractStartDate}>{prettyDate(contractStartDate)}</time>
         </div>
