@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { loadStorage, saveStorage } from "@/components/utils/localstorage";
+import { loadStorage, saveStorage } from "@/utils/localstorage";
 import { startOfDay, formatISO } from "date-fns";
 
 type SettingsProviderProps = {
