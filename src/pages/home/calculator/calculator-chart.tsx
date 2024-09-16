@@ -58,7 +58,7 @@ export const CalculatorChart: React.FC<{ concatenatedMonthlyBreakdown: Concatena
         accessibilityLayer
         data={concatenatedMonthlyBreakdown}
         layout="vertical">
-        <CartesianGrid horizontal={false} verticalValues={[firstMinCost]} />
+        <CartesianGrid vertical={tooltipActive} horizontal={false} verticalValues={[firstMinCost]} />
         <YAxis width={118} dataKey="label" type="category" tickLine={false} tickMargin={36} axisLine={false} orientation="right" />
         <XAxis dataKey="minCost" type="number" hide />
         <XAxis dataKey="maxCost" type="number" hide />
