@@ -1,5 +1,6 @@
-import { loadStorage, saveStorage } from "@/components/utils/localstorage";
 import { createContext, useContext, useState } from "react";
+import { loadStorage, saveStorage } from "@/components/utils/localstorage";
+import { startOfDay } from "date-fns";
 
 type SettingsProviderProps = {
   children: React.ReactNode;
@@ -15,7 +16,7 @@ type SettingsProviderState = {
 
 const initialState = {
   currencySettings: { prefix: "£" },
-  contractStartDate: new Date(), // ! TODO: from T 00:00
+  contractStartDate: startOfDay(new Date()),
   updateSettings: () => null,
 };
 
@@ -23,13 +24,14 @@ const SettingsProviderContext = createContext<SettingsProviderState>(initialStat
 
 export function SettingsProvider({ children, defaultCurrencySettings = { prefix: "£" }, storageKey = "site-settings", ...props }: SettingsProviderProps) {
   const [{ currencySettings, contractStartDate }, setSettings] = useState(
-    () => loadStorage(storageKey, { currencySettings: defaultCurrencySettings, contractStartDate: new Date() }, true) as SettingsProviderState,
+    () =>
+      loadStorage(storageKey, { currencySettings: defaultCurrencySettings, contractStartDate: initialState.contractStartDate }, true) as SettingsProviderState,
   );
 
   const simpleUpdateSettingsWithStorage = (newValues: Partial<SettingsProviderState>) => {
     setSettings((prev) => {
       const value = { ...prev, newValues };
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
       const { contractStartDate, ...valuesWithoutDate } = value;
       saveStorage(storageKey, valuesWithoutDate);
       return value;
