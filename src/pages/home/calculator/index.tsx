@@ -8,11 +8,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { InputWithLabel } from "@/components/ui-custom/input-with-label";
 import { Currency } from "@/components/ui-custom/currency";
+import { ContractSelect } from "./contract-select";
 // import { Input } from "@/components/ui/input";
 // import { Button } from "@/components/ui/button";
 // import { generatePaymentMonths } from "@/helpers/generate-payment-months";
 // ? TYPES:
-import type { CalculatorState, PriceAdjustement } from "./calculator.types";
+import type { CalculatorChangeEvent, CalculatorState, PriceAdjustement } from "./calculator.types";
 
 function generateUid() {
   return window.btoa(Math.random() + "".substring(0, 12));
@@ -23,6 +24,7 @@ function generateInitialIncreaseDates(startIsoDate: ISODate, contractLength: num
   const thisYearIncreaseDate = set(startDate, increaseMonthAndDay);
   const firstYearOffset = isAfter(startDate, thisYearIncreaseDate) ? 1 : 0;
   const dateCount = Math.floor(contractLength / 12);
+  console.log({ dateCount });
   return Array.from(Array(dateCount)).map((_, i) => formatISO(add(thisYearIncreaseDate, { years: i + firstYearOffset })));
 }
 
@@ -34,13 +36,17 @@ const act = {
 } as const;
 
 // type ActionType = keyof typeof act;
+
 type Action =
-  | { type: "ON_CHANGE_VALUE"; event: React.ChangeEvent<HTMLInputElement> }
+  | { type: "ON_CHANGE_VALUE"; event: CalculatorChangeEvent; contractStartDate?: ISODate }
   | { type: "ON_ADD_INCREASE"; contractStartDate: ISODate }
   | { type: "ON_REMOVE_INCREASE"; i: number }
-  | { type: "ON_CONTRACT_START_DATE_CHANGE"; contractStartDate: ISODate };
+  | { type: "ON_CONTRACT_START_DATE_CHANGE"; contractStartDate: ISODate; initial?: boolean };
 
-function limitValue(v: string, max: string) {
+function limitValue(v: string | number, max: string) {
+  if (typeof v !== "string") {
+    return v;
+  }
   const value = v.startsWith("0") ? parseFloat(v) + "" : v;
   if (!max) {
     return value;
@@ -56,9 +62,9 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
   if (action.type === act.ON_CHANGE_VALUE) {
     const { name, value: rawValue, max } = action.event.target;
     const value = limitValue(rawValue, max);
-    const [key, indexStr] = name.split("@");
-    const parsedValue = value === "" ? 0 : parseFloat(value);
-    if (indexStr === undefined) {
+    const [key, adjustementIndexStr] = name.split("@");
+    const parsedValue = value === "" ? 0 : parseFloat(value as string);
+    if (adjustementIndexStr === undefined) {
       return {
         ...state,
         [key]: value,
@@ -68,7 +74,7 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
         },
       };
     }
-    const index = parseInt(indexStr, 10);
+    const index = parseInt(adjustementIndexStr, 10);
     const newAdjustements = state.adjustements.map((adj, i) => (index === i ? { ...adj, [key]: value } : adj));
     const newParsedAdjustements = state.parsed.adjustements.map((adj, i) => (index === i ? { ...adj, [key]: parsedValue } : adj));
     return {
@@ -112,6 +118,10 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
     };
   }
   if (action.type === act.ON_CONTRACT_START_DATE_CHANGE) {
+    if (!action.initial && state.adjustements.length === 0) {
+      console.log({ action });
+      return state;
+    }
     const isoDates = generateInitialIncreaseDates(action.contractStartDate, state.contractLength);
     const newAdjustements = isoDates.map((increaseDate, i) => {
       const newAdj = state.adjustements[i] || initialAdjustement;
@@ -139,6 +149,17 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
   }
   return state;
 }
+
+const dispatchMiddleware = (dispatch: React.Dispatch<Action>) => (action: Action) => {
+  if (action.type === "ON_CHANGE_VALUE") {
+    dispatch(action);
+    if (action.contractStartDate) {
+      dispatch({ type: "ON_CONTRACT_START_DATE_CHANGE", contractStartDate: action.contractStartDate });
+    }
+  } else {
+    dispatch(action);
+  }
+};
 
 const initialParsedAdjustement: PriceAdjustement<number, string | undefined> = {
   staticPercentageIncrease: 3.9,
@@ -178,11 +199,12 @@ const initialState: CalculatorState = {
 export const Calculator = () => {
   const { currencySettings, contractStartDate } = useSettings();
   const [state, dispatch] = useReducer(reducer, initialState);
+  const customDispatch = dispatchMiddleware(dispatch);
   useEffect(() => {
-    dispatch({ type: "ON_CONTRACT_START_DATE_CHANGE", contractStartDate });
+    dispatch({ type: "ON_CONTRACT_START_DATE_CHANGE", contractStartDate, initial: true });
   }, [contractStartDate]);
-  const onValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: act.ON_CHANGE_VALUE, event });
+  const onValueChange = (event: CalculatorChangeEvent) => {
+    customDispatch({ type: act.ON_CHANGE_VALUE, event, contractStartDate });
   };
   return (
     <main className="grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-8">
@@ -227,7 +249,7 @@ export const Calculator = () => {
                 <Label htmlFor="contractLength" className="max-w-40">
                   Contract Length
                 </Label>
-                <span>{state.contractLength}</span>
+                <ContractSelect value={state.contractLength} onValueChange={onValueChange} />
               </div>
               <div className="flex flex-wrap gap-3 items-center [&>*]:grow [&>*]:w-auto [&>label]:text-right">
                 <Label htmlFor="phoneValue" className="max-w-40 text-xs">
