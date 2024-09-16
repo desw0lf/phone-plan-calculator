@@ -40,7 +40,8 @@ type Action =
   | { type: "ON_REMOVE_INCREASE"; i: number }
   | { type: "ON_CONTRACT_START_DATE_CHANGE"; contractStartDate: ISODate };
 
-function limitValue(value: string, max: string) {
+function limitValue(v: string, max: string) {
+  const value = v.startsWith("0") ? parseFloat(v) + "" : v;
   if (!max) {
     return value;
   }
