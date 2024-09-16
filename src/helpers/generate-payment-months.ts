@@ -1,10 +1,8 @@
 import { isAfter, parseISO, add } from "date-fns";
+// ? TYPES:
+import type { InitialMonthBreakdown } from "../pages/home/calculator/calculator.types";
 
-export function generatePaymentMonths(
-  startDate: ISODate,
-  contractLength: number,
-  adjustementDates: ISODate[],
-): { date: Date; billingIndex: number; isIncreaseStartDate?: boolean }[] {
+export function generatePaymentMonths(startDate: ISODate, contractLength: number, adjustementDates: ISODate[]): InitialMonthBreakdown[] {
   const beginDate = parseISO(startDate);
   const increaseDates = adjustementDates.map((d) => parseISO(d));
   const { months } = Array.from(Array(contractLength)).reduce(

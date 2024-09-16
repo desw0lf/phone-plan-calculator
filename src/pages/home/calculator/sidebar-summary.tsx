@@ -2,28 +2,14 @@ import { useMemo } from "react";
 import { Currency } from "@/components/ui-custom/currency";
 import { cn as classNames } from "@/lib/utils";
 import { Info, Copy, MoreVertical } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
+// import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Chart } from "./chart";
 import { generatePaymentMonths } from "@/helpers/generate-payment-months";
-import { prettyDate } from "@/utils/pretty-date";
+import { prettyDate, prettyRange } from "@/utils/pretty-date";
 // ? TYPES:
-import type { CalculatorState } from "./calculator.types";
-
-type InitialMonthlyBreakdown = ReturnType<typeof generatePaymentMonths>[0];
-
-interface MonthBreakdown extends InitialMonthlyBreakdown {
-  minCost: number;
-  maxCost: number;
-  label: string;
-}
-
-interface ConcatenatedMonthBreakdown extends MonthBreakdown {
-  totalMinCost: number;
-  totalMaxCost: number;
-  costDifference: number;
-  monthCount: number;
-}
+import type { CalculatorState, MonthBreakdown, ConcatenatedMonthBreakdown } from "./calculator.types";
 
 function updateCost(originalValue: number, percent: number, fixed: number): number {
   const result = originalValue * (1 + percent / 100) + fixed;
@@ -31,7 +17,7 @@ function updateCost(originalValue: number, percent: number, fixed: number): numb
 }
 
 export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contractStartDate: ISODate }> = ({ state, contractStartDate }) => {
-  const { totals, monthlyBreakdown, concatenatedMonthlyBreakdown } = useMemo(() => {
+  const { totals, concatenatedMonthlyBreakdown, dateLabel } = useMemo(() => {
     // const hasAdjustments = state.adjustements.length > 0;
     const adjustmentIsoDates = state.adjustements.map(({ increaseDate }) => increaseDate);
     const months = generatePaymentMonths(contractStartDate, state.contractLength, adjustmentIsoDates);
@@ -72,11 +58,10 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
         console.warn("strange, very strange...");
       }
       const last = group.at(-1)!;
-      const pattern = "MMM yy";
       const [totalMinCost, totalMaxCost] = group.reduce(([min, max], { minCost, maxCost }) => [min + minCost, max + maxCost], [0, 0]);
       return {
         ...first,
-        label: prettyDate(first.date, pattern) + " - " + prettyDate(last.date, pattern),
+        label: prettyRange([first.date, last.date]),
         costDifference: Math.floor(first.maxCost - first.minCost),
         totalMinCost: Math.floor(totalMinCost),
         totalMaxCost: Math.floor(totalMaxCost),
@@ -85,6 +70,7 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
     });
 
     return {
+      dateLabel: prettyRange([monthlyBreakdown[0].date, monthlyBreakdown.at(-1)!.date], "MMMM y"),
       monthlyBreakdown,
       concatenatedMonthlyBreakdown,
       totals: {
@@ -94,7 +80,7 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
       },
     };
   }, [state, contractStartDate]);
-  console.log({ monthlyBreakdown, concatenatedMonthlyBreakdown });
+
   const totalList = [
     { label: "Minimum", value: totals.minimum },
     { label: "Maximum", value: totals.maximum },
@@ -153,8 +139,9 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
               </li>
             ))}
           </ul>
-          <Separator className="my-4" />
-          <div className="font-semibold">Monthly cost breakdown</div>
+          {/* <Separator className="my-4" />
+          <div className="font-semibold">Monthly cost breakdown</div> */}
+          <Chart concatenatedMonthlyBreakdown={concatenatedMonthlyBreakdown} subheading={dateLabel} />
         </div>
       </CardContent>
       <CardFooter className="flex flex-row items-center border-t bg-muted/35 px-6 py-3">

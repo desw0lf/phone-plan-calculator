@@ -15,3 +15,22 @@ export interface CalculatorState<TNumberInput = string | "", T2UID = string> {
   adjustements: PriceAdjustement<TNumberInput, T2UID>[];
   parsed: Omit<CalculatorState<number, string | undefined>, "parsed">;
 }
+
+export interface InitialMonthBreakdown {
+  date: Date;
+  billingIndex: number;
+  isIncreaseStartDate?: boolean;
+}
+
+export interface MonthBreakdown extends InitialMonthBreakdown {
+  minCost: number;
+  maxCost: number;
+  label: string;
+}
+
+export interface ConcatenatedMonthBreakdown extends MonthBreakdown {
+  totalMinCost: number;
+  totalMaxCost: number;
+  costDifference: number;
+  monthCount: number;
+}
