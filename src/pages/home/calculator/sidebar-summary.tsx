@@ -4,8 +4,9 @@ import { cn as classNames } from "@/lib/utils";
 import { Info, Copy, MoreVertical } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Chart } from "./chart";
+import { CalculatorChart } from "./calculator-chart";
 import { generatePaymentMonths } from "@/helpers/generate-payment-months";
 import { prettyDate, prettyRange } from "@/utils/pretty-date";
 // ? TYPES:
@@ -87,12 +88,16 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
     {
       label: "Proclaimed",
       value: totals.guessOriginal,
-      className: "opacity-60",
-      tooltip: "TODO",
+      tooltip: (
+        <span>
+          This value excludes any increases, this is probably what you will see as the advertised{" "}
+          <code className="bg-foreground/10 px-1.5 rounded-md">Total Cost</code> on the deal website
+        </span>
+      ),
     },
   ];
   return (
-    <Card className="flex flex-col overflow-hidden">
+    <Card className="flex flex-col">
       <CardHeader className="flex flex-row items-start bg-muted/35">
         <div className="grid gap-0.5">
           <CardTitle className="group flex items-center gap-2 text-lg">
@@ -129,12 +134,21 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
         <div className="grid gap-3">
           <div className="font-semibold">Total cost over {state.contractLength} months</div>
           <ul className="grid gap-3">
-            {totalList.map(({ label, value, className, tooltip }) => (
-              <li key={label} className={classNames("flex items-center justify-between", className)}>
-                <span className="text-muted-foreground inline-flex items-center gap-1">
-                  {label}
-                  {tooltip && <Info className="h-3.5 w-3.5" />}
-                </span>
+            {totalList.map(({ label, value, tooltip }) => (
+              <li key={label} className={"flex items-center justify-between"}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className={classNames("text-muted-foreground inline-flex items-center gap-1", { "opacity-60": !!tooltip })}>
+                      {label}
+                      {!!tooltip && <Info className="h-3.5 w-3.5" />}
+                    </span>
+                  </TooltipTrigger>
+                  {!!tooltip && (
+                    <TooltipContent side="bottom" className="max-w-md leading-relaxed">
+                      {tooltip}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
                 <Currency value={value} />
               </li>
             ))}
@@ -144,7 +158,7 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
             <div className="font-semibold">Monthly cost breakdown</div>
             <p className="text-xs text-muted-foreground">{dateLabel}</p>
           </div>
-          <Chart concatenatedMonthlyBreakdown={concatenatedMonthlyBreakdown} />
+          <CalculatorChart concatenatedMonthlyBreakdown={concatenatedMonthlyBreakdown} />
         </div>
       </CardContent>
       <CardFooter className="mt-auto flex flex-row items-center border-t bg-muted/35 px-6 py-3">

@@ -218,7 +218,7 @@ export const Calculator = () => {
         <Card>
           <CardContent className="pt-6">
             <div className="grid gap-4">
-              <div className="flex gap-3">
+              <div className="flex gap-3 flex-wrap">
                 <div className="flex flex-col gap-3">
                   <Label htmlFor="monthlyCost">Monthly Cost</Label>
                   <InputWithLabel
@@ -254,7 +254,7 @@ export const Calculator = () => {
                   <Label htmlFor="contractLength">Contract Length</Label>
                   <ContractSelect value={state.contractLength} onValueChange={onValueChange} />
                 </div>
-                <div className="flex flex-col gap-3 ml-auto">
+                <div className="flex flex-col gap-3">
                   <Label htmlFor="phoneValue" className="text-xs leading-none text-muted-foreground">
                     Phone Value
                     <SmallLabelHack />
@@ -294,8 +294,15 @@ export const Calculator = () => {
                     <br />
                     It's just Monthly Cost (
                     <Currency className="text-foreground" value={state.parsed.monthlyCost} />) x Contract Length (
-                    <span className="text-foreground">{state.contractLength}</span>) + Upfront Cost (
-                    <Currency className="text-foreground" value={state.parsed.upfrontCost} />) ={" "}
+                    <span className="text-foreground">{state.contractLength}</span>)
+                    {state.parsed.upfrontCost > 0 && (
+                      <>
+                        {" "}
+                        + Upfront Cost (
+                        <Currency className="text-foreground" value={state.parsed.upfrontCost} />)
+                      </>
+                    )}{" "}
+                    ={" "}
                     <Currency
                       className="text-foreground font-medium"
                       value={state.parsed.upfrontCost + state.parsed.monthlyCost * state.parsed.contractLength}
@@ -306,9 +313,9 @@ export const Calculator = () => {
             )}
             {state.adjustements.map((adj, i) => (
               <fieldset key={adj.uid} className="relative grid gap-4 rounded-lg border p-4">
-                <legend className="-ml-0.5 px-3 text-md font-medium text-[--input-label-foreground]">Adjustment {i + 1}</legend>
+                <legend className="-ml-0.5 px-3 text-md font-medium text-[--input-label-foreground]">Increase {i + 1}</legend>
                 <div className="grid gap-3">
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 flex-wrap">
                     <div className="flex flex-col gap-3">
                       <Label htmlFor={`staticPercentageIncrease@${i}`}>% Increase</Label>
                       <InputWithLabel
@@ -326,7 +333,7 @@ export const Calculator = () => {
                     </div>
                     <div className="flex flex-col gap-3">
                       <Label htmlFor={`rpiPercentagePredictionFrom@${i}`}>
-                        RPI % Prediction <span className="text-xs text-muted-foreground ml-2 opacity-80">(From - To)</span>
+                        RPI % Prediction <span className="text-xs leading-none text-muted-foreground ml-2 opacity-80">(From - To)</span>
                       </Label>
                       <div className="flex items-center">
                         <InputWithLabel
@@ -375,7 +382,7 @@ export const Calculator = () => {
                         onChange={onValueChange}
                       />
                     </div>
-                    <div className="flex flex-col gap-3 ml-auto">
+                    <div className="flex flex-col gap-3 min-[1686px]:ml-auto">
                       <Label htmlFor={`increaseDate@${i}`} className="text-xs leading-none text-muted-foreground">
                         Starting date
                         <SmallLabelHack />
@@ -388,7 +395,7 @@ export const Calculator = () => {
                   type="button"
                   size="icon"
                   variant="outline"
-                  className="absolute right-0 top-2/4 translate-x-2/4 -translate-y-2/4 rounded-full h-6 w-6"
+                  className="absolute right-0 top-2/4 translate-x-2/4 -translate-y-2/4 rounded-full h-6 w-6 text-red-600 hover:text-red-600"
                   onClick={() => dispatch({ type: act.ON_REMOVE_INCREASE, i })}>
                   <Minus className="h-3.5 w-3.5" />
                   <span className="sr-only">Remove Increase</span>
@@ -396,7 +403,11 @@ export const Calculator = () => {
               </fieldset>
             ))}
             <footer>
-              <Button type="button" className="gap-1 w-full" variant="ghost" onClick={() => dispatch({ type: act.ON_ADD_INCREASE, contractStartDate })}>
+              <Button
+                type="button"
+                className="gap-1 w-full text-green-600 hover:text-green-600 hover:bg-green-600/5"
+                variant="ghost"
+                onClick={() => dispatch({ type: act.ON_ADD_INCREASE, contractStartDate })}>
                 <CirclePlus className="h-3.5 w-3.5" />
                 Add Increase
               </Button>
