@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 type ThemeName = "system" | "light" | "dark" | (string & {});
 
@@ -10,12 +10,14 @@ type ThemeProviderProps = {
 
 type ThemeProviderState = {
   theme: ThemeName;
+  themeComputed: Omit<ThemeName, "system">;
   setTheme: (theme: string) => void;
   toggleThemeDarkLight: () => void;
 };
 
 const initialState = {
   theme: "system",
+  themeComputed: "light",
   setTheme: () => null,
   toggleThemeDarkLight: () => null,
 };
@@ -24,6 +26,10 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({ children, defaultTheme = "system", storageKey = "vite-ui-theme", ...props }: ThemeProviderProps) {
   const [theme, setTheme] = useState(() => localStorage.getItem(storageKey) || defaultTheme);
+  const themeComputed = useMemo(() => {
+    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    return theme === "system" ? systemTheme : theme;
+  }, [theme]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -47,11 +53,10 @@ export function ThemeProvider({ children, defaultTheme = "system", storageKey = 
 
   const value = {
     theme,
+    themeComputed,
     setTheme: setThemeWithStorage,
     toggleThemeDarkLight: () => {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      const currentTheme = theme === "system" ? systemTheme : theme;
-      setThemeWithStorage(currentTheme === "dark" ? "light" : "dark");
+      setThemeWithStorage(themeComputed === "dark" ? "light" : "dark");
     },
   };
 

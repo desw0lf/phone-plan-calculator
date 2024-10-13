@@ -21,7 +21,7 @@ const Link: React.FC<{
 };
 
 export function Main() {
-  const title = "PPC";
+  const title = import.meta.env.VITE_TITLE;
   const menuItems = [{ label: "Calculation 3rd03r", id: "x" }];
   return (
     <div className="grid min-h-full w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70 border rounded-lg shadow-xl">
@@ -119,7 +119,7 @@ export function Main() {
             <TooltipTrigger asChild>
               <ThemeToggle />
             </TooltipTrigger>
-            <TooltipContent side="top" className="text-xs">
+            <TooltipContent side="top" sideOffset={12} className="text-xs">
               Toggle theme
             </TooltipContent>
           </Tooltip>
@@ -127,7 +127,7 @@ export function Main() {
             <Tooltip>
               <PopoverTrigger asChild>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" className="[&:hover_svg]:stroke-primary">
                     <Settings className="h-5 w-5" />
                     <span className="sr-only">Settings</span>
                   </Button>
@@ -141,7 +141,7 @@ export function Main() {
           </Popover>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="[&:hover_svg]:stroke-primary">
                 <Share className="h-5 w-5" />
                 <span className="sr-only">Share</span>
               </Button>

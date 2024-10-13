@@ -14,6 +14,7 @@ export const ContractSelect: React.FC<ContractSelectProps> = ({ value, onValueCh
   const onChange = (v: number) => {
     onValueChange({ target: { name: "contractLength", value: v as unknown as string, max: "" } });
   };
+
   return (
     <RadioGroup value={value as unknown as string} onValueChange={onChange as never} className="grid grid-cols-3 gap-4">
       {list.map((item) => (

@@ -161,6 +161,8 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
           <CalculatorChart concatenatedMonthlyBreakdown={concatenatedMonthlyBreakdown} />
         </div>
       </CardContent>
+      {/* <div className="min-h-3" style={{ height: "-webkit-fill-available" }}>
+      </div> */}
       <CardFooter className="mt-auto flex flex-row items-center border-t bg-muted/35 px-6 py-3">
         <div className="text-xs text-muted-foreground">
           Updated <time dateTime={contractStartDate}>{prettyDate(contractStartDate)}</time>
