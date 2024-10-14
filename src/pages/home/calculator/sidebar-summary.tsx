@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalculatorChart } from "./calculator-chart";
+import { MonthlyChart } from "./monthly-chart";
 import { generatePaymentMonths } from "@/helpers/generate-payment-months";
 import { prettyDate, prettyRange } from "@/utils/pretty-date";
 // ? TYPES:
@@ -53,6 +54,9 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
       return acc;
     }, [] as MonthBreakdown[][]);
 
+    const highestCostValue = monthlyBreakdown.at(-1)!.maxCost;
+    const getPercentageOfHighestValue = (value: number) => (highestCostValue === 0 ? 0 : (value / highestCostValue) * 100);
+
     const concatenatedMonthlyBreakdown: ConcatenatedMonthBreakdown[] = grouped.map((group) => {
       const first = group[0];
       if (!first) {
@@ -63,6 +67,8 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
       return {
         ...first,
         label: prettyRange([first.date, last.date]),
+        minCostWidthPercentage: getPercentageOfHighestValue(first.minCost),
+        maxCostWidthPercentage: getPercentageOfHighestValue(first.maxCost),
         costDifference: Math.floor(first.maxCost - first.minCost),
         totalMinCost: Math.floor(totalMinCost),
         totalMaxCost: Math.floor(totalMaxCost),
@@ -159,6 +165,12 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
             <p className="text-xs text-muted-foreground">{dateLabel}</p>
           </div>
           <CalculatorChart concatenatedMonthlyBreakdown={concatenatedMonthlyBreakdown} />
+          <Separator className="my-4" />
+          <div>
+            <div className="font-semibold">Monthly cost breakdown</div>
+            <p className="text-xs text-muted-foreground">{dateLabel}</p>
+          </div>
+          <MonthlyChart concatenatedMonthlyBreakdown={concatenatedMonthlyBreakdown} />
         </div>
       </CardContent>
       {/* <div className="min-h-3" style={{ height: "-webkit-fill-available" }}>

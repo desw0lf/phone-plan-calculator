@@ -33,6 +33,8 @@ export interface ConcatenatedMonthBreakdown extends MonthBreakdown {
   totalMaxCost: number;
   costDifference: number;
   monthCount: number;
+  minCostWidthPercentage: number;
+  maxCostWidthPercentage: number;
 }
 
 export type CalculatorChangeEvent = { target: Pick<React.ChangeEvent<HTMLInputElement>["target"], "value" | "name" | "max"> };

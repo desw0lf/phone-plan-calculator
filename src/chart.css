@@ -1,0 +1,42 @@
+.charty {
+  --bar-height: 9px;
+  --bar-count: 1;
+  --bar-width: 0;
+  --bar-label-width: 90px;
+  container-type: inline-size;
+}
+
+.charty__bar {
+  min-height: 12px;
+  height: calc(var(--bar-height) * var(--bar-count));
+}
+
+.charty__bar,
+.charty__label__bar {
+  transition: width 0.4s ease;
+  width: var(--bar-width);
+}
+
+.charty__label {
+  flex: 0 0 var(--bar-label-width);
+}
+
+.charty__month-separators > * {
+  border-image: linear-gradient(90deg, #000000, hsl(0deg 0% 0% / 0%), hsl(0deg 0% 0% / 0%)) 1;
+}
+
+@container (max-width: 280px) {
+  .charty__row {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+    align-items: start;
+  }
+
+  .charty__row > div:first-child {
+    width: 100%;
+  }
+
+  .charty__row .charty__label {
+    flex-basis: auto;
+  }
+}
