@@ -18,7 +18,9 @@ function updateCost(originalValue: number, percent: number, fixed: number): numb
 }
 
 export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contractStartDate: ISODate }> = ({ state, contractStartDate }) => {
-  const { totals, concatenatedMonthlyBreakdown, dateLabel } = useMemo(() => {
+  const { totals, isEmpty, concatenatedMonthlyBreakdown, dateLabel } = useMemo(() => {
+    const isEmpty = state.monthlyCost === 0;
+    const initialMonthlyCost = isEmpty ? 20 : state.monthlyCost;
     // const hasAdjustments = state.adjustements.length > 0;
     const adjustmentIsoDates = state.adjustements.map(({ increaseDate }) => increaseDate);
     const months = generatePaymentMonths(contractStartDate, state.contractLength, adjustmentIsoDates);
@@ -37,11 +39,11 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
           monthlyBreakdown: [...acc.monthlyBreakdown, newValue],
           minCost,
           maxCost,
-          totalMin: acc.totalMin + minCost,
-          totalMax: acc.totalMax + maxCost,
+          totalMin: isEmpty ? 0 : acc.totalMin + minCost,
+          totalMax: isEmpty ? 0 : acc.totalMax + maxCost,
         };
       },
-      { monthlyBreakdown: [], minCost: state.monthlyCost, maxCost: state.monthlyCost, totalMin: 0, totalMax: 0 },
+      { monthlyBreakdown: [], minCost: initialMonthlyCost, maxCost: initialMonthlyCost, totalMin: 0, totalMax: 0 },
     );
 
     const grouped: MonthBreakdown[][] = monthlyBreakdown.reduce((acc, m) => {
@@ -79,6 +81,7 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
       dateLabel: prettyRange([monthlyBreakdown[0].date, monthlyBreakdown.at(-1)!.date], "MMMM y"),
       monthlyBreakdown,
       concatenatedMonthlyBreakdown,
+      isEmpty,
       totals: {
         minimum: totalMin + state.upfrontCost,
         maximum: totalMax + state.upfrontCost,
@@ -163,7 +166,7 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
             <div className="font-semibold">Monthly cost breakdown</div>
             <p className="text-xs text-muted-foreground">{dateLabel}</p>
           </div>
-          <MonthlyChart concatenatedMonthlyBreakdown={concatenatedMonthlyBreakdown} />
+          <MonthlyChart concatenatedMonthlyBreakdown={concatenatedMonthlyBreakdown} isEmpty={isEmpty} />
         </div>
       </CardContent>
       {/* <div className="min-h-3" style={{ height: "-webkit-fill-available" }}>

@@ -44,6 +44,7 @@ type Action =
   | { type: "ON_CONTRACT_START_DATE_CHANGE"; contractStartDate: ISODate; initial?: boolean };
 
 function limitValue(v: string | number, max: string) {
+  // todo: fix deselect
   if (typeof v !== "string") {
     return v;
   }

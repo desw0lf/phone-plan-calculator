@@ -10,6 +10,7 @@ import type { ConcatenatedMonthBreakdown } from "./calculator.types";
 
 interface MonthlyChartProps {
   concatenatedMonthlyBreakdown: ConcatenatedMonthBreakdown[];
+  isEmpty?: boolean;
 }
 
 type CSS = React.CSSProperties;
@@ -27,7 +28,7 @@ interface BarProps {
 const LegendItem: React.FC<TLegendBoxTooltip> = ({ label, className, value, labelSuffix }) => (
   <div className="flex items-center gap-1.5">
     <div className="flex items-center gap-1.5">
-      <div className={cn("h-2 w-2 shrink-0 rounded-[2px]", className)}></div>
+      <div className={cn("charty__dot h-2 w-2 shrink-0 rounded-[2px]", className)}></div>
       <span>
         {label} {labelSuffix}
       </span>
@@ -63,7 +64,7 @@ const Bar: React.FC<BarProps & { children?: React.ReactNode }> = ({ width, class
 
 const BarLabels: React.FC<{ items: BarProps[] }> = ({ items }) => {
   return (
-    <div className="charty__bar absolute flex items-center justify-end rounded-r-lg cursor-default" style={{ "--bar-width": `100%` } as CSS}>
+    <div className="charty__bar absolute flex items-center justify-end rounded-r-lg cursor-default" style={{ minWidth: "100%" }}>
       <div className="flex flex-col w-full h-full justify-evenly">
         {items.map((item, i) => (
           <div key={i} className="charty__label__bar flex justify-end gap-2" style={{ "--bar-width": `${item.width}%` } as CSS}>
@@ -103,7 +104,7 @@ const ChartTooltip: React.FC<{ title: string; subtitle?: string; items: TLegendB
   </div>
 );
 
-export const MonthlyChart: React.FC<MonthlyChartProps> = ({ concatenatedMonthlyBreakdown }) => {
+export const MonthlyChart: React.FC<MonthlyChartProps> = ({ concatenatedMonthlyBreakdown, isEmpty }) => {
   const { currencySettings } = useSettings();
   const legendItems = [
     { label: "Min Cost", className: "bg-yellow-100 dark:bg-yellow-50", labelSuffix: "(p/m)" },
@@ -122,9 +123,9 @@ export const MonthlyChart: React.FC<MonthlyChartProps> = ({ concatenatedMonthlyB
     },
     [currencySettings],
   );
-  console.log(concatenatedMonthlyBreakdown);
+
   return (
-    <div>
+    <div className={cn("charty__wrapper", isEmpty && "charty__wrapper--empty")}>
       <div className="charty relative leading-none flex flex-col gap-6 py-4">
         <VerticalLine xPercentage={concatenatedMonthlyBreakdown[0].minCostWidthPercentage} />
         {concatenatedMonthlyBreakdown.map((item) => (
@@ -132,16 +133,18 @@ export const MonthlyChart: React.FC<MonthlyChartProps> = ({ concatenatedMonthlyB
             <TooltipTrigger asChild>
               <div className="charty__row flex flex-grow items-center gap-4" style={{ "--bar-count": item.monthCount } as CSS}>
                 <div className="flex gap-2 flex-col flex-grow relative">
-                  <Bar className={`${legendItems[1].className} absolute`} width={item.maxCostWidthPercentage}>
-                    {/* <MonthSeparators count={item.monthCount} /> */}
-                  </Bar>
+                  {item.maxCostWidthPercentage !== item.minCostWidthPercentage && (
+                    <Bar className={`${legendItems[1].className} absolute`} width={item.maxCostWidthPercentage}>
+                      {/* <MonthSeparators count={item.monthCount} /> */}
+                    </Bar>
+                  )}
                   <Bar className={`${legendItems[0].className} dark:shadow-[1px_0_6px_1px_rgba(0,0,0,0.15)]`} width={item.minCostWidthPercentage}>
                     {/* <MonthSeparators count={item.monthCount} /> */}
                   </Bar>
                   <BarLabels
                     items={[
-                      { label: currencyFormatter(item.minCost, ""), width: item.minCostWidthPercentage, className: legendItems[0].className },
-                      { label: currencyFormatter(item.maxCost, ""), width: item.maxCostWidthPercentage, className: legendItems[1].className },
+                      { label: isEmpty ? "?" : currencyFormatter(item.minCost, ""), width: item.minCostWidthPercentage, className: legendItems[0].className },
+                      { label: isEmpty ? "?" : currencyFormatter(item.maxCost, ""), width: item.maxCostWidthPercentage, className: legendItems[1].className },
                     ]}
                   />
                 </div>
@@ -151,7 +154,7 @@ export const MonthlyChart: React.FC<MonthlyChartProps> = ({ concatenatedMonthlyB
                 </span>
               </div>
             </TooltipTrigger>
-            {item.minCost > 0 && (
+            {!isEmpty && (
               <TooltipPortal>
                 <TooltipContent side="left" sideOffset={12} className="text-xs py-3">
                   <ChartTooltip

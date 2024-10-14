@@ -6,6 +6,22 @@
   container-type: inline-size;
 }
 
+.charty__wrapper .charty__row > div:first-child,
+.charty_wrapper .charty__dot {
+  opacity: 1;
+  transition: opacity 0.8s ease;
+}
+
+.charty__wrapper--empty .charty__row > div:first-child,
+.charty__wrapper--empty .charty__dot {
+  opacity: 0.3;
+}
+
+.charty__wrapper--empty .charty__label__bar > * {
+  padding-left: 1.376rem;
+  padding-right: 1.376rem;
+}
+
 .charty__bar {
   min-height: 12px;
   height: calc(var(--bar-height) * var(--bar-count));
