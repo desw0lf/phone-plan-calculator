@@ -1,6 +1,7 @@
 import { createContext, useContext, useState } from "react";
+import { initialContractStartDate } from "../consts";
 import { loadStorage, saveStorage } from "@/utils/localstorage";
-import { startOfDay, formatISO } from "date-fns";
+// import { startOfDay, formatISO } from "date-fns";
 
 type SettingsProviderProps = {
   children: React.ReactNode;
@@ -16,7 +17,7 @@ type SettingsProviderState = {
 
 const initialState = {
   currencySettings: { prefix: "£" },
-  contractStartDate: formatISO(startOfDay(new Date())),
+  contractStartDate: initialContractStartDate,
   updateSettings: () => null,
 };
 

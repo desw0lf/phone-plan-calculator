@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { InputWithLabel } from "@/components/ui-custom/input-with-label";
 import { Currency } from "@/components/ui-custom/currency";
 import { ContractSelect } from "./contract-select";
+import { initialContractStartDate } from "../../../consts";
 // import { Input } from "@/components/ui/input";
 // import { Button } from "@/components/ui/button";
 // import { generatePaymentMonths } from "@/helpers/generate-payment-months";
@@ -26,6 +27,30 @@ function generateInitialIncreaseDates(startIsoDate: ISODate, contractLength: num
   const dateCount = Math.floor(contractLength / 12);
   console.log({ dateCount });
   return Array.from(Array(dateCount)).map((_, i) => formatISO(add(thisYearIncreaseDate, { years: i + firstYearOffset })));
+}
+
+function generateAdjustements(
+  startIsoDate: ISODate,
+  contractLength: number,
+  state: Pick<CalculatorState, "adjustements"> & { parsed: Pick<CalculatorState["parsed"], "adjustements"> },
+): { newAdjustements: CalculatorState["adjustements"]; newParsedAdjustements: CalculatorState["parsed"]["adjustements"] } {
+  const isoDates = generateInitialIncreaseDates(startIsoDate, contractLength);
+  const newAdjustements = isoDates.map((increaseDate, i) => {
+    const newAdj = state.adjustements[i] || initialAdjustement;
+    return {
+      ...newAdj,
+      uid: generateUid(),
+      increaseDate,
+    };
+  });
+  const newParsedAdjustements = isoDates.map((increaseDate, i) => {
+    const newAdj = state.parsed.adjustements[i] || initialParsedAdjustement;
+    return {
+      ...newAdj,
+      increaseDate,
+    };
+  });
+  return { newAdjustements, newParsedAdjustements };
 }
 
 const act = {
@@ -123,22 +148,7 @@ function reducer(state: CalculatorState, action: Action): CalculatorState {
       console.log({ action });
       return state;
     }
-    const isoDates = generateInitialIncreaseDates(action.contractStartDate, state.contractLength);
-    const newAdjustements = isoDates.map((increaseDate, i) => {
-      const newAdj = state.adjustements[i] || initialAdjustement;
-      return {
-        ...newAdj,
-        uid: generateUid(),
-        increaseDate,
-      };
-    });
-    const newParsedAdjustements = isoDates.map((increaseDate, i) => {
-      const newAdj = state.parsed.adjustements[i] || initialParsedAdjustement;
-      return {
-        ...newAdj,
-        increaseDate,
-      };
-    });
+    const { newAdjustements, newParsedAdjustements } = generateAdjustements(action.contractStartDate, state.contractLength, state);
     return {
       ...state,
       adjustements: newAdjustements,
@@ -180,12 +190,14 @@ const initialAdjustement: PriceAdjustement = {
   uid: "",
 };
 
+const { newAdjustements, newParsedAdjustements } = generateAdjustements(initialContractStartDate, 24, { adjustements: [], parsed: { adjustements: [] } });
+
 const initialParsed: CalculatorState["parsed"] = {
   monthlyCost: 0,
   upfrontCost: 0,
   contractLength: 24,
   phoneValue: 0,
-  adjustements: [],
+  adjustements: newParsedAdjustements,
 };
 
 const initialState: CalculatorState = {
@@ -193,7 +205,7 @@ const initialState: CalculatorState = {
   upfrontCost: initialParsed.upfrontCost + "",
   contractLength: 24,
   phoneValue: "",
-  adjustements: [],
+  adjustements: newAdjustements,
   parsed: initialParsed,
 };
 
