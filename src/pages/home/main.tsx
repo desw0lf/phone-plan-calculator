@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 // import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Advert } from "@/components/ui-custom/advert";
+// import { Advert } from "@/components/ui-custom/advert";
 import { Calculator } from "./calculator";
 
 const Link: React.FC<{
@@ -57,9 +57,9 @@ export function Main() {
               ))}
             </nav>
           </div>
-          <div className="mt-auto self-center">
+          {/* <div className="mt-auto self-center">
             <Advert />
-          </div>
+          </div> */}
           <div className="px-4 pb-4 self-center">
             <Button variant="link" size="sm" className="-mx-3">
               Find out more
@@ -97,10 +97,10 @@ export function Main() {
                   </Link>
                 ))}
               </nav>
-              <div className="mt-auto self-center">
+              {/* <div className="mt-auto self-center">
                 <Advert />
               </div>
-              <div>test</div>
+              <div>test</div> */}
             </SheetContent>
           </Sheet>
           <div className="w-full flex-1">
