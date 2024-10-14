@@ -267,7 +267,7 @@ export const Calculator = () => {
                   <Label htmlFor="contractLength">Contract Length</Label>
                   <ContractSelect value={state.contractLength} onValueChange={onValueChange} />
                 </div>
-                <div className="flex flex-col gap-3">
+                {/* <div className="flex flex-col gap-3">
                   <Label htmlFor="phoneValue" className="text-xs leading-none text-muted-foreground">
                     Phone Value
                     <SmallLabelHack />
@@ -284,7 +284,7 @@ export const Calculator = () => {
                     value={state.phoneValue}
                     onChange={onValueChange}
                   />
-                </div>
+                </div> */}
               </div>
             </div>
           </CardContent>
@@ -429,7 +429,7 @@ export const Calculator = () => {
         </Card>
       </form>
       <div className="lg:col-span-3">
-        <SidebarSummary state={state.parsed} contractStartDate={contractStartDate} />
+        <SidebarSummary state={state.parsed} contractStartDate={contractStartDate} onValueChange={onValueChange} />
       </div>
     </main>
   );

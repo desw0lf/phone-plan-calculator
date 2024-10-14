@@ -4,20 +4,25 @@ import { cn as classNames } from "@/lib/utils";
 import { Info, Copy, MoreVertical } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { PhoneValue } from "./phone-value";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { MonthlyChart } from "../monthly-chart";
 import { generatePaymentMonths } from "@/helpers/generate-payment-months";
 import { prettyDate, prettyRange } from "@/utils/pretty-date";
 // ? TYPES:
-import type { CalculatorState, MonthBreakdown, ConcatenatedMonthBreakdown } from "./calculator.types";
+import type { CalculatorState, MonthBreakdown, ConcatenatedMonthBreakdown, CalculatorChangeEvent } from "./calculator.types";
 
 function updateCost(originalValue: number, percent: number, fixed: number): number {
   const result = originalValue * (1 + percent / 100) + fixed;
   return parseFloat(result.toFixed(2));
 }
 
-export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contractStartDate: ISODate }> = ({ state, contractStartDate }) => {
+export const SidebarSummary: React.FC<{
+  state: CalculatorState["parsed"];
+  contractStartDate: ISODate;
+  onValueChange: (event: CalculatorChangeEvent) => void;
+}> = ({ state, contractStartDate, onValueChange }) => {
   const { totals, isEmpty, concatenatedMonthlyBreakdown, dateLabel } = useMemo(() => {
     const isEmpty = state.monthlyCost === 0;
     const initialMonthlyCost = isEmpty ? 20 : state.monthlyCost;
@@ -140,7 +145,10 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
       </CardHeader>
       <CardContent className="p-6 text-sm">
         <div className="grid gap-3">
-          <div className="font-semibold">Total cost over {state.contractLength} months</div>
+          <div className="flex items-center gap-2">
+            <span className="font-semibold">Total cost over {state.contractLength} months</span>
+            <PhoneValue value={state.phoneValue} onChange={onValueChange} />
+          </div>
           <ul className="grid gap-3">
             {totalList.map(({ label, value, tooltip }) => (
               <li key={label} className={"flex items-center justify-between"}>

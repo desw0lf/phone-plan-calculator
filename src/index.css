@@ -68,6 +68,9 @@
 } */
 
 @layer base {
+  .popover__arrow {
+    @apply fill-border;
+  }
   * {
     @apply border-border;
   }
