@@ -6,7 +6,6 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalculatorChart } from "./calculator-chart";
 import { MonthlyChart } from "./monthly-chart";
 import { generatePaymentMonths } from "@/helpers/generate-payment-months";
 import { prettyDate, prettyRange } from "@/utils/pretty-date";
@@ -159,12 +158,6 @@ export const SidebarSummary: React.FC<{ state: CalculatorState["parsed"]; contra
               </li>
             ))}
           </ul>
-          <Separator className="my-4" />
-          <div>
-            <div className="font-semibold">Monthly cost breakdown</div>
-            <p className="text-xs text-muted-foreground">{dateLabel}</p>
-          </div>
-          <CalculatorChart concatenatedMonthlyBreakdown={concatenatedMonthlyBreakdown} />
           <Separator className="my-4" />
           <div>
             <div className="font-semibold">Monthly cost breakdown</div>
