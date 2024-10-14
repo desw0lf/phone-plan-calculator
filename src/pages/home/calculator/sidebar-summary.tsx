@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { MonthlyChart } from "./monthly-chart";
+import { MonthlyChart } from "../monthly-chart";
 import { generatePaymentMonths } from "@/helpers/generate-payment-months";
 import { prettyDate, prettyRange } from "@/utils/pretty-date";
 // ? TYPES:

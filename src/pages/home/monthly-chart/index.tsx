@@ -2,107 +2,20 @@ import { useCallback } from "react";
 import { useSettings } from "@/providers/settings-provider";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipPortal } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { VerticalLine } from "./vertical-line";
+import { Legend } from "./legend";
+import { ChartTooltip } from "./chart-tooltip";
+import { Bar } from "./bar";
+import { BarLabels } from "./bar-labels";
 import { toCurrency } from "@/helpers/to-currency";
 // ? TYPES:
-import type { ConcatenatedMonthBreakdown } from "./calculator.types";
-
-// type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+import type { ConcatenatedMonthBreakdown } from "../calculator/calculator.types";
+import type { CSS } from "./monthly-chart.types";
 
 interface MonthlyChartProps {
   concatenatedMonthlyBreakdown: ConcatenatedMonthBreakdown[];
   isEmpty?: boolean;
 }
-
-type CSS = React.CSSProperties;
-
-type TLegendBox<T = undefined | null> = { label: string; className: string; value?: T; labelSuffix?: string };
-
-type TLegendBoxTooltip = TLegendBox<string | null>;
-
-interface BarProps {
-  width: number;
-  className?: string;
-  label?: string;
-}
-
-const LegendItem: React.FC<TLegendBoxTooltip> = ({ label, className, value, labelSuffix }) => (
-  <div className="flex items-center gap-1.5">
-    <div className="flex items-center gap-1.5">
-      <div className={cn("charty__dot h-2 w-2 shrink-0 rounded-[2px]", className)}></div>
-      <span>
-        {label} {labelSuffix}
-      </span>
-    </div>
-    {value && <span className="charty__legend__value ml-auto font-mono font-medium text-foreground">{value}</span>}
-  </div>
-);
-
-const Legend: React.FC<{ items: TLegendBox[] }> = ({ items }) => (
-  <aside className="flex items-center justify-center gap-4 pt-3 text-xs">
-    {items.map((item) => (
-      <LegendItem key={item.label} {...item} />
-    ))}
-  </aside>
-);
-
-// const MonthSeparators: React.FC<{ count: number }> = ({ count }) => (
-//   <aside className="charty__month-separators absolute pointer-events-none flex flex-col h-full left-0 w-6 mt-px opacity-10 dark:opacity-40">
-//     {Array.from({ length: count - 1 }, (_, i) => (
-//       <div key={i} className="w-full pointer-events-none border-b border-dotted" style={{ height: `${100 / count}%` }}></div>
-//     ))}
-//   </aside>
-// );
-
-const Bar: React.FC<BarProps & { children?: React.ReactNode }> = ({ width, className, children, label }) => (
-  <div
-    className={cn("charty__bar relative flex items-center justify-end rounded-r-lg cursor-default", className)}
-    style={{ "--bar-width": `${width}%` } as CSS}>
-    {children}
-    {label && <span className="text-slate-900 font-semibold text-sm px-3">{label}</span>}
-  </div>
-);
-
-const BarLabels: React.FC<{ items: BarProps[] }> = ({ items }) => {
-  return (
-    <div className="charty__bar absolute flex items-center justify-end rounded-r-lg cursor-default" style={{ minWidth: "100%" }}>
-      <div className="flex flex-col w-full h-full justify-evenly">
-        {items.map((item, i) => (
-          <div key={i} className="charty__label__bar flex justify-end gap-2" style={{ "--bar-width": `${item.width}%` } as CSS}>
-            <span className={cn("text-slate-900 font-semibold text-sm mr-2 px-1 rounded-lg", item.className)}>{item.label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const VerticalLine: React.FC<{ xPercentage: number }> = ({ xPercentage }) => {
-  if (xPercentage <= 0) {
-    return null;
-  }
-  return (
-    <div className="absolute w-full inset-y-0 -z-[1] pointer-events-none flex flex-grow items-center gap-4">
-      <div className="h-full flex gap-2 flex-col flex-grow">
-        <div className="bg-border w-[2px] h-full" style={{ marginLeft: `${xPercentage}%` }} />
-      </div>
-      <span className="charty__label text-xs text-muted-foreground"></span>
-    </div>
-  );
-};
-
-const ChartTooltip: React.FC<{ title: string; subtitle?: string; items: TLegendBoxTooltip[] }> = ({ title, subtitle, items }) => (
-  <div className="grid gap-3">
-    <header className="flex flex-col">
-      <span className="text-sm">{title}</span>
-      <span className="text-muted-foreground">{subtitle}</span>
-    </header>
-    <div className="grid gap-1.5 pb-1 [&>*]:gap-6">
-      {items.map((item) => (
-        <LegendItem key={item.label} {...item} />
-      ))}
-    </div>
-  </div>
-);
 
 export const MonthlyChart: React.FC<MonthlyChartProps> = ({ concatenatedMonthlyBreakdown, isEmpty }) => {
   const { currencySettings } = useSettings();
